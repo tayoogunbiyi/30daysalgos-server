@@ -65,4 +65,13 @@ UserSchema.methods.generateJWT = async function(password) {
   }
 };
 
+UserSchema.methods.verifyJWT = async function(token) {
+  try {
+    const isMatch = await jwt.verify(token, process.env.SECRET || "secret!?");
+    return isMatch
+  } catch (error) {
+    return null;
+  }
+}
+
 module.exports = mongoose.model("User", UserSchema);
