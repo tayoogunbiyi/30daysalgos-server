@@ -65,6 +65,19 @@ UserSchema.methods.generateJWT = async function(password) {
   }
 };
 
+UserSchema.methods.generateOauthJWT = async function() {
+  try {
+    const payload = { id: this._id };
+    const token = await jwt.sign(payload, process.env.SECRET  || 'secret!?' , {
+      expiresIn: process.env.expiresIn || 36000
+    });
+    return token;
+
+  } catch (error) {
+    return null
+  }
+}
+
 UserSchema.methods.verifyJWT = async function(token) {
   try {
     const isMatch = await jwt.verify(token, process.env.SECRET || "secret!?");

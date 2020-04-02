@@ -77,6 +77,33 @@ router.post('/login', joiValidate(loginSchema), async (req, res) => {
   ));
 });
 
+
+router.post('/oauth',  async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    const response = buildResponse(
+      messages.INVALID_CREDENTIALS,
+    );
+    return res.status(401).json(response);
+  }
+
+  const token = await user.generateOauthJWT();
+  if (!token) {
+    const response = buildResponse(
+      messages.INVALID_CREDENTIALS,
+    );
+    return res.status(401).json(response);
+  }
+
+  return res.json(buildResponse(
+    `Logged in ${messages.SUCCESS_MESSAGE}`,
+    {
+      token,
+    },
+    true,
+  ));
+});
+
 router.get("/user", async (req, res) => {
 
   if (!req.body.email && !req.body.name) {
