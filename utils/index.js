@@ -37,12 +37,11 @@ const parseFile = (filePath) => {
 }
 
 const computeUserResult = (referenceResultFilePath, userResultFilePath) => {
-  const referenceResult = parseFile(referenceResultFilePath);
-  const userResult = parseFile(userResultFilePath);
-  const totalTestCases = parseInt(referenceResult[0]);
   let passedTestCases = 0;
+  const totalTestCases = parseInt(referenceResult[0]);
   try {
-    // starts from 1 since the result file ideally has the first entry as the number of test cases
+    const referenceResult = parseFile(referenceResultFilePath);
+    const userResult = parseFile(userResultFilePath);
     let resultPtr = 1;
     while (resultPtr < Math.min(referenceResult.length,userResult.length)){
       if (referenceResult[resultPtr] === userResult[resultPtr]){
@@ -51,7 +50,8 @@ const computeUserResult = (referenceResultFilePath, userResultFilePath) => {
       resultPtr+=1
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
+    return -1;
     
   }
   return passedTestCases/totalTestCases
