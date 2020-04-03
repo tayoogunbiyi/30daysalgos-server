@@ -2,8 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const User = mongoose.model("User");
+const {createProblem} = require('./questionRoutes')
 const { joiValidate } = require('express-joi');
-const { registrationSchema, loginSchema, } = require('../validation/validationSchemas');
+const { registrationSchema, loginSchema,questionSchema } = require('../validation/validationSchemas');
 const messages = require('../services/responseMessages');
 
 const {buildResponse} = require('../services/responseBuilder');
@@ -76,5 +77,7 @@ router.post('/login', joiValidate(loginSchema), async (req, res) => {
     true,
   ));
 });
+
+router.post('/question',joiValidate(questionSchema),createQuestion)
 
 module.exports = router;
