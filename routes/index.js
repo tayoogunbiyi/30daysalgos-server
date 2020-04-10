@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const User = mongoose.model("User");
+const Leaderboard = mongoose.model("Leaderboard");
 const { joiValidate } = require('express-joi');
 const { registrationSchema, loginSchema, } = require('../validation/validationSchemas');
 const messages = require('../services/responseMessages');
@@ -76,5 +77,12 @@ router.post('/login', joiValidate(loginSchema), async (req, res) => {
     true,
   ));
 });
+
+router.get('/leaderboard', async (req, res) => {
+  const leaderboard = await Leaderboard.find({});
+  return res.json(buildResponse(`Leaderboard fetch ${messages.SUCCESS_MESSAGE}`, {
+    leaderboard
+  }, true))
+})
 
 module.exports = router;
