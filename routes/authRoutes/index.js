@@ -8,6 +8,10 @@ const {buildResponse} = require('../../services/responseBuilder');
 const router = express.Router();
 
 
+router.post('/google',passport.authenticate('google-token', {session: false}),(req,res) => {
+  
+})
+
 
 router.post('/register', joiValidate(registrationSchema), async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
@@ -43,7 +47,7 @@ router.post('/register', joiValidate(registrationSchema), async (req, res) => {
     }
   });
   
-  router.post('/login', joiValidate(loginSchema), async (req, res) => {
+router.post('/login', joiValidate(loginSchema), async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       const response = buildResponse(
