@@ -67,8 +67,8 @@ UserSchema.methods.generateJWT = async function(password) {
 
 UserSchema.methods.generateOauthJWT = async function() {
   try {
-    const payload = { id: this._id };
-    const token = await jwt.sign(payload, process.env.SECRET  || 'secret!?' , {
+    const payload = { id: this._id,email:this.email };
+    const token = await jwt.sign(payload, process.env.SECRET, {
       expiresIn: process.env.expiresIn || 36000
     });
     return token;
@@ -76,6 +76,28 @@ UserSchema.methods.generateOauthJWT = async function() {
   } catch (error) {
     return null
   }
+}
+
+UserSchema.statics.createSocialUser = async function(token,profile){
+  const {displayName:name,emails} = profile;
+  const email = emails[0].value;
+  const user = await this.findOne({ email});
+  if(user) return user;
+  const hashedToken = await this.generateHash(token);
+  if(!hashedToken) throw new Error('Unable to create new user');
+  try{
+    const newUser = new this();
+    newUser.email = email
+    newUser.name = name
+    newUser.password = hashedToken
+    newUser.save();
+    return newUser;
+  }catch(e){
+    throw new Error(e.message);
+  }
+  
+
+
 }
 
 UserSchema.methods.verifyJWT = async function(token) {

@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const passport = require("passport");
 const User = mongoose.model("User");
 const { joiValidate } = require('express-joi');
 const { registrationSchema, loginSchema, } = require('../../validation/validationSchemas');
@@ -8,6 +9,32 @@ const {buildResponse} = require('../../services/responseBuilder');
 const router = express.Router();
 
 
+
+
+router.post('/google',passport.authenticate('google-token', {session: false}), async function(req, res) {
+  if (!req.user) {
+      return res.status(400).json(buildResponse(
+        messages.INVALID_CREDENTIALS
+      ));
+  }
+  const user = req.user;
+  const token = await user.generateOauthJWT();
+  if(!token) {
+    return res.status(500).json(
+      buildResponse(
+        messages.SERVER_ERROR
+      )
+    )
+  }
+  
+  return res.json(buildResponse(
+    `Logged in ${messages.SUCCESS_MESSAGE}`,
+    {
+      token,
+    },
+    true,
+  ));
+});
 
 router.post('/register', joiValidate(registrationSchema), async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
@@ -43,7 +70,7 @@ router.post('/register', joiValidate(registrationSchema), async (req, res) => {
     }
   });
   
-  router.post('/login', joiValidate(loginSchema), async (req, res) => {
+router.post('/login', joiValidate(loginSchema), async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       const response = buildResponse(

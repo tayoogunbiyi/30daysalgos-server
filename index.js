@@ -44,6 +44,8 @@ const indexRouter = require("./routes/index");
 
 app.use("/", indexRouter);
 
+require('./passport-strategies')();
+
 app.listen(port, () => {
   console.log(`server running on port ${port}`);
 });
