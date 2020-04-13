@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const authRoutes = require('./authRoutes')
-const Leaderboard = mongoose.model("Leaderboard");
+const questionRoutes = require('./questionRoutes')
 const messages = require('../services/responseMessages');
 
 const { buildResponse } = require('../services/responseBuilder');
@@ -16,13 +16,14 @@ router.get("/", (req, res) => {
 });
 
 router.use('/auth',authRoutes)
+router.use('/questions',passport.authenticate('jwt'),questionRoutes)
 
-router.get('/leaderboard', async (req, res) => {
-  const leaderboard = await Leaderboard.find({});
-  return res.json(buildResponse(`Leaderboard fetch ${messages.SUCCESS_MESSAGE}`, {
-    leaderboard
-  }, true))
-})
+// router.get('/leaderboard', async (req, res) => {
+//   const leaderboard = await Leaderboard.find({});
+//   return res.json(buildResponse(`Leaderboard fetch ${messages.SUCCESS_MESSAGE}`, {
+//     leaderboard
+//   }, true))
+// })
 
 
 
