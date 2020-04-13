@@ -36,5 +36,13 @@ QuestionSchema.methods.toJSON = function () {
     return obj;
 };
 
+QuestionSchema.statics.getAllQuestionsBefore = function (date) {
+    try {
+        return this.find({ visibleBy: { $lte: date } })
+    } catch (error) {
+        throw new Error('Could not fetch questions')
+    }
+}
+
 
 module.exports = mongoose.model("Question", QuestionSchema);
