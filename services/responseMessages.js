@@ -6,7 +6,11 @@ const EMAIL_NOT_AVAILABLE = 'Email already taken.';
 const SERVER_ERROR = 'An error occured.';
 const NOT_FOUND = 'not found';
 const INVALID_TOKEN = 'Invalid token';
-const SPECIALIZATION_EXISTS = 'This specialization exists already.'
+const SPECIALIZATION_EXISTS = 'This specialization exists already.';
+
+const buildDuplicateMessage = (duplicateField) => {
+  return `'${duplicateField}' already exists`
+}
 module.exports = {
   INVALID_CREDENTIALS,
   ACCOUNT_NOT_VERIFIED,
@@ -17,4 +21,5 @@ module.exports = {
   NOT_FOUND,
   INVALID_TOKEN,
   SPECIALIZATION_EXISTS,
+  buildDuplicateMessage,
 };
