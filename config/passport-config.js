@@ -19,7 +19,7 @@ module.exports = passport => {
               id: user.id,
               name: user.name,
               email: user.email,
-              companies: user.companies
+              role: user.role
             });
           }
           return done(null, false);
