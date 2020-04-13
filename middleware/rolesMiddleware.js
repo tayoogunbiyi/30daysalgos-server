@@ -4,12 +4,16 @@ const { ADMIN, SUPERADMIN } = rolesWeightMap;
 
 const NOT_PERMITTED_MSG = 'You are not permitted to perform this operation';
 
+const cleanUserRole = (role) => {
+    if (role == undefined || role == null || !(role in rolesWeightMap)){
+        return 'USER';
+    }
+    return role;
+}
+
 const isAdminOrGreater = (req, res, next) => {
-  let currentUserRole = req.user.role;
-  if (currentUserRole == undefined || currentUserRole == null || !(currentUserRole in rolesWeightMap)){
-      currentUserRole = 'USER';
-  }
-  console.log(rolesWeightMap[currentUserRole] === ADMIN)
+  const currentUserRole = cleanUserRole(req.user.role);
+
   if (ADMIN > rolesWeightMap[currentUserRole]) {
     return res.status(403).json({ message: NOT_PERMITTED_MSG });
   }
@@ -17,7 +21,7 @@ const isAdminOrGreater = (req, res, next) => {
 };
 
 const isSuperAdminOrGreater = (req, res, next) => {
-  const currentUserRole = req.user.role;
+  const currentUserRole = cleanUserRole(req.user.role);
   if (SUPERADMIN > rolesWeightMap[currentUserRole]) {
     return res.status(403).json({ message: NOT_PERMITTED_MSG });
   }
