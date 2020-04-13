@@ -23,7 +23,12 @@ const UserSchema = new Schema({
   active: {
     type: Boolean,
     default: true
-  }
+  },
+  role: {
+    type: String,
+    enum: ['ADMIN', 'SUPERADMIN', 'USER'],
+    default: 'USER',
+  },
 });
 
 UserSchema.methods.toJSON = function() {
