@@ -1,8 +1,6 @@
 /* eslint-disable func-names */
 /* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const {
     Schema
