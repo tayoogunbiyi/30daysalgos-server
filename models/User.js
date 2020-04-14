@@ -9,37 +9,38 @@ const { Schema } = mongoose;
 const UserSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   active: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
+  role: {
+    type: String,
+    enum: ["ADMIN", "SUPERADMIN", "USER"],
+    default: "USER",
+  },
 });
 
-UserSchema.methods.toJSON = function() {
+UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
-  const fieldsToDelete = [
-    "password",
-    "__v ",
-    "active",
-  ];
-  fieldsToDelete.forEach(field => {
+  const fieldsToDelete = ["password", "__v ", "active"];
+  fieldsToDelete.forEach((field) => {
     delete obj[field];
   });
   return obj;
 };
 
-UserSchema.statics.generateHash = async password => {
+UserSchema.statics.generateHash = async (password) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
@@ -49,15 +50,15 @@ UserSchema.statics.generateHash = async password => {
   }
 };
 
-UserSchema.methods.generateJWT = async function(password) {
+UserSchema.methods.generateJWT = async function (password) {
   try {
     const isMatch = await bcrypt.compare(password, this.password);
     if (!isMatch) {
       return null;
     }
     const payload = { id: this._id };
-    const token = await jwt.sign(payload, process.env.SECRET  || 'secret!?' , {
-      expiresIn: process.env.expiresIn || 36000
+    const token = await jwt.sign(payload, process.env.SECRET || "secret!?", {
+      expiresIn: process.env.expiresIn || 36000,
     });
     return token;
   } catch (error) {
@@ -65,48 +66,44 @@ UserSchema.methods.generateJWT = async function(password) {
   }
 };
 
-UserSchema.methods.generateOauthJWT = async function() {
+UserSchema.methods.generateOauthJWT = async function () {
   try {
-    const payload = { id: this._id,email:this.email };
+    const payload = { id: this._id, email: this.email };
     const token = await jwt.sign(payload, process.env.SECRET, {
-      expiresIn: process.env.expiresIn || 36000
+      expiresIn: process.env.expiresIn || 36000,
     });
     return token;
-
-  } catch (error) {
-    return null
-  }
-}
-
-UserSchema.statics.createSocialUser = async function(token,profile){
-  const {displayName:name,emails} = profile;
-  const email = emails[0].value;
-  const user = await this.findOne({ email});
-  if(user) return user;
-  const hashedToken = await this.generateHash(token);
-  if(!hashedToken) throw new Error('Unable to create new user');
-  try{
-    const newUser = new this();
-    newUser.email = email
-    newUser.name = name
-    newUser.password = hashedToken
-    newUser.save();
-    return newUser;
-  }catch(e){
-    throw new Error(e.message);
-  }
-  
-
-
-}
-
-UserSchema.methods.verifyJWT = async function(token) {
-  try {
-    const isMatch = await jwt.verify(token, process.env.SECRET || "secret!?");
-    return isMatch
   } catch (error) {
     return null;
   }
-}
+};
+
+UserSchema.statics.createSocialUser = async function (token, profile) {
+  const { displayName: name, emails } = profile;
+  const email = emails[0].value;
+  const user = await this.findOne({ email });
+  if (user) return user;
+  const hashedToken = await this.generateHash(token);
+  if (!hashedToken) throw new Error("Unable to create new user");
+  try {
+    const newUser = new this();
+    newUser.email = email;
+    newUser.name = name;
+    newUser.password = hashedToken;
+    newUser.save();
+    return newUser;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+};
+
+UserSchema.methods.verifyJWT = async function (token) {
+  try {
+    const isMatch = await jwt.verify(token, process.env.SECRET || "secret!?");
+    return isMatch;
+  } catch (error) {
+    return null;
+  }
+};
 
 module.exports = mongoose.model("User", UserSchema);
