@@ -18,8 +18,17 @@ const questionSchema = {
   visibleBy: Joi.date().required(),
 };
 
+const questionUpdateSchema = {
+  // id - url param
+  id: Joi.string().required(),
+  title: Joi.string(),
+  description: Joi.string(),
+  visibleBy: Joi.date(),
+};
+
 module.exports = {
   registrationSchema,
   loginSchema,
   questionSchema,
+  questionUpdateSchema,
 };

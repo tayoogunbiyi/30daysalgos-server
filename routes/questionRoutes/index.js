@@ -7,7 +7,10 @@ const {
 const { joiValidate } = require("express-joi");
 
 const { checkValidId } = require("../../utils/");
-const { questionSchema } = require("../../validation/validationSchemas");
+const {
+  questionSchema,
+  questionUpdateSchema,
+} = require("../../validation/validationSchemas");
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
 
@@ -94,7 +97,7 @@ router.post(
 router.get("/:id", userCanViewQuestion, async (req, res) => {
   try {
     const { id } = req.params;
-    checkValidId();
+    checkValidId(id);
     const question = await Question.findQ(id).populate("examples");
     if (!question) throw Error("Question Not Found!");
     return res.json(
@@ -115,6 +118,35 @@ router.get("/:id", userCanViewQuestion, async (req, res) => {
   }
 });
 
+router.put(
+  "/:id",
+  isAdminOrGreater,
+  joiValidate(questionUpdateSchema),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      checkValidId(id);
+      const question = await Question.updateQ(id, req.body);
+      return res.json(
+        buildResponse(
+          `Updated question with ${id} ${messages.SUCCESS_MESSAGE}`,
+          question,
+          true
+        )
+      );
+    } catch (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR),
+          null,
+          false
+        );
+    }
+  }
+);
+
 router.delete("/:id", isAdminOrGreater, async (req, res) => {
   try {
     const { id } = req.params;
@@ -134,4 +166,5 @@ router.delete("/:id", isAdminOrGreater, async (req, res) => {
       .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
   }
 });
+
 module.exports = router;

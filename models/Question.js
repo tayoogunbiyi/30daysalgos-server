@@ -85,6 +85,19 @@ QuestionSchema.statics.userCanView = async function (userRole, __id) {
   return true;
 };
 
+QuestionSchema.statics.updateQ = async function (id, data) {
+  //MyModel.findOneAndUpdate(query, req.newData, {upsert: true}
+  return this.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    data,
+    {
+      new: true,
+    }
+  );
+};
+
 // QuestionSchema.statics.get = async function (user, questionId) {
 //   if (!user || !questionId || !mongoose.isValidObjectId(questionId)) {
 //     return false;
