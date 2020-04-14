@@ -6,16 +6,18 @@ const {
 } = require("../../middleware/rolesMiddleware");
 const { joiValidate } = require("express-joi");
 
-const { checkValidId } = require("../../utils/");
+const { checkValidId, checkValidIdOnObj } = require("../../utils/");
 const {
   questionSchema,
   questionUpdateSchema,
+  exampleSchema,
 } = require("../../validation/validationSchemas");
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
 
 const { buildDuplicateMessage } = messages;
 const Question = mongoose.model("Question");
+const Example = mongoose.model("Example");
 
 const router = express.Router();
 
@@ -40,7 +42,7 @@ router.get("/", async (req, res) => {
 
 router.get("/all", isAdminOrGreater, async (req, res) => {
   try {
-    const allQuestions = await Question.find({});
+    const allQuestions = await Question.find({}).populate("examples");
     return res.json(
       buildResponse(
         `Fetched all questions ${messages.SUCCESS_MESSAGE}`,
@@ -167,4 +169,37 @@ router.delete("/:id", isAdminOrGreater, async (req, res) => {
   }
 });
 
+router.post(
+  "/:id/examples",
+  joiValidate(exampleSchema),
+  isAdminOrGreater,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      checkValidIdOnObj(id, Question);
+      const example = await Example.create(req.body);
+      const q = await Question.findQ(id);
+      q.examples.push(example._id);
+      q.save();
+      return res.json(
+        buildResponse(
+          `Created example successfully`,
+          {
+            example,
+            q,
+          },
+          true
+        )
+      );
+    } catch (error) {
+      res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR),
+          null,
+          false
+        );
+    }
+  }
+);
 module.exports = router;

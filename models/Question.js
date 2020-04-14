@@ -58,7 +58,7 @@ QuestionSchema.statics.findQ = function (id) {
 
 QuestionSchema.statics.getAllQuestionsBefore = function (date) {
   try {
-    return this.find({ visibleBy: { $lte: date } });
+    return this.find({ visibleBy: { $lte: date } }).populate("examples");
   } catch (error) {
     throw new Error("Could not fetch questions");
   }

@@ -26,9 +26,25 @@ const questionUpdateSchema = {
   visibleBy: Joi.date(),
 };
 
+const exampleSchema = {
+  id: Joi.string().required(),
+  input: Joi.string().required(),
+  output: Joi.string().required(),
+  explanation: Joi.string().required(),
+};
+
+const exampleUpdateSchema = {
+  id: Joi.string().required(),
+  input: Joi.string(),
+  output: Joi.string(),
+  explanation: Joi.string(),
+};
+
 module.exports = {
   registrationSchema,
   loginSchema,
   questionSchema,
+  exampleSchema,
+  exampleUpdateSchema,
   questionUpdateSchema,
 };

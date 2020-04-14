@@ -4,7 +4,7 @@ const passport = require("passport");
 const authRoutes = require("./authRoutes");
 const questionRoutes = require("./questionRoutes");
 const messages = require("../services/responseMessages");
-
+const { checkValidId } = require("../utils/index");
 const { buildResponse } = require("../services/responseBuilder");
 
 require("../config/passport-config")(passport);
@@ -16,7 +16,11 @@ router.get("/", (req, res) => {
 });
 
 router.use("/auth", authRoutes);
-router.use("/questions", passport.authenticate("jwt"), questionRoutes);
+router.use(
+  "/questions",
+  passport.authenticate("jwt"),
+  questionRoutes
+);
 
 // router.get('/leaderboard', async (req, res) => {
 //   const leaderboard = await Leaderboard.find({});
