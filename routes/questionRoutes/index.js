@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { isAdminOrGreater } = require("../../middleware/rolesMiddleware");
+const {
+  isAdminOrGreater,
+  userCanViewQuestion,
+} = require("../../middleware/rolesMiddleware");
 const { joiValidate } = require("express-joi");
 
 const { questionSchema } = require("../../validation/validationSchemas");
@@ -31,7 +34,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/all", async (req, res) => {
+router.get("/all", isAdminOrGreater, async (req, res) => {
   try {
     const allQuestions = await Question.find({});
     return res.json(
@@ -86,5 +89,28 @@ router.post(
     }
   }
 );
+
+router.get("/:id", userCanViewQuestion, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const question = await Question.findQ(id).populate("examples");
+    if (!question) throw Error("Question Not Found!");
+    return res.json(
+      buildResponse(
+        `Fetched question with ${req.id} ${messages.SUCCESS_MESSAGE}`,
+        question,
+        true
+      )
+    );
+  } catch (error) {
+    let status = 500;
+    if (error.message && error.message.includes("Not Found!")) {
+      status = 404;
+    }
+    res
+      .status(status)
+      .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
+  }
+});
 
 module.exports = router;

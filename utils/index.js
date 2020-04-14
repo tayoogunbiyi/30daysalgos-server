@@ -11,6 +11,14 @@ const removeInvalidIds = (arr) => {
   return validIds;
 };
 
+const checkValidId = (__id) => {
+  if (!ObjectId.isValid(__id)) {
+    throw new Error("Invalid Question Id");
+  }
+  return true;
+};
+
 module.exports = {
   removeInvalidIds,
+  checkValidId,
 };

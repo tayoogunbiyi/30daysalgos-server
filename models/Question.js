@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
-const { START_DATE } = require("../constants/questions.js");
+const rolesWeightMap = require("../constants/rolesWeightMap");
+const { checkValidId } = require("../utils/");
+const { START_DATE } = require("../constants/questions");
 
-const { Schema } = mongoose;
+const { Schema, Types } = mongoose;
+const { ObjectId } = mongoose.Types;
+
+const ADMIN_WEIGHT = rolesWeightMap.ADMIN;
 
 const QuestionSchema = new Schema({
   title: {
@@ -38,6 +43,11 @@ QuestionSchema.methods.toJSON = function () {
   return obj;
 };
 
+QuestionSchema.statics.findQ = function (id) {
+  // throws error if failure
+  checkValidId(id);
+  return this.findById(id);
+};
 // QuestionSchema.virtual('day').get(function(){
 //     const visibleBy = this.visibleBy;
 //     console.log(visibleBy-START_DATE)
@@ -53,5 +63,32 @@ QuestionSchema.statics.getAllQuestionsBefore = function (date) {
     throw new Error("Could not fetch questions");
   }
 };
+
+QuestionSchema.statics.userCanView = async function (userRole, __id) {
+  const userRoleWeight = rolesWeightMap[userRole];
+  if (!userRoleWeight || userRoleWeight < ADMIN_WEIGHT) {
+    const dateFilter = {
+      $lte: new Date(),
+    };
+    const isDue = await this.exists({
+      _id: new ObjectId(__id),
+      visibleBy: dateFilter,
+    });
+    return isDue;
+  }
+  return true;
+};
+
+// QuestionSchema.statics.get = async function (user, questionId) {
+//   if (!user || !questionId || !mongoose.isValidObjectId(questionId)) {
+//     return false;
+//   }
+//   const extraDateFilterObj = {
+//     visibleBy: {
+//       $lte: Date.now(),
+//     },
+//   };
+//   const question = await this.findIfExists(questionId, extraDateFilterObj);
+// };
 
 module.exports = mongoose.model("Question", QuestionSchema);
