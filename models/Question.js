@@ -64,6 +64,12 @@ QuestionSchema.statics.getAllQuestionsBefore = function (date) {
   }
 };
 
+QuestionSchema.statics.deleteQ = function (id) {
+  checkValidId(id);
+  console.log(id);
+  return this.deleteOne({ _id: id });
+};
+
 QuestionSchema.statics.userCanView = async function (userRole, __id) {
   const userRoleWeight = rolesWeightMap[userRole];
   if (!userRoleWeight || userRoleWeight < ADMIN_WEIGHT) {

@@ -6,6 +6,7 @@ const {
 } = require("../../middleware/rolesMiddleware");
 const { joiValidate } = require("express-joi");
 
+const { checkValidId } = require("../../utils/");
 const { questionSchema } = require("../../validation/validationSchemas");
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
@@ -93,11 +94,12 @@ router.post(
 router.get("/:id", userCanViewQuestion, async (req, res) => {
   try {
     const { id } = req.params;
+    checkValidId();
     const question = await Question.findQ(id).populate("examples");
     if (!question) throw Error("Question Not Found!");
     return res.json(
       buildResponse(
-        `Fetched question with ${req.id} ${messages.SUCCESS_MESSAGE}`,
+        `Fetched question with ${id} ${messages.SUCCESS_MESSAGE}`,
         question,
         true
       )
@@ -113,4 +115,23 @@ router.get("/:id", userCanViewQuestion, async (req, res) => {
   }
 });
 
+router.delete("/:id", isAdminOrGreater, async (req, res) => {
+  try {
+    const { id } = req.params;
+    checkValidId(id);
+    const result = await Question.deleteQ(id);
+    if (!result.deletedCount) throw Error("Unable to delete question");
+    return res.json(
+      buildResponse(
+        `Deleted question with ${id} ${messages.SUCCESS_MESSAGE}`,
+        null,
+        true
+      )
+    );
+  } catch (error) {
+    res
+      .status(400)
+      .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
+  }
+});
 module.exports = router;
