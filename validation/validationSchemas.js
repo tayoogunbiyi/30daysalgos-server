@@ -1,4 +1,4 @@
-const expressJoi = require('express-joi');
+const expressJoi = require("express-joi");
 
 const { Joi } = expressJoi;
 
@@ -13,11 +13,10 @@ const registrationSchema = {
 };
 
 const questionSchema = {
-  title:Joi.string().required(),
-  description:Joi.string().required(),
-  visibleBy:Joi.date().required(),
-}
-
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  visibleBy: Joi.date().required(),
+};
 
 module.exports = {
   registrationSchema,

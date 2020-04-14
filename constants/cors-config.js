@@ -13,9 +13,9 @@ const corsConfig = {
       console.log(origin);
       callback(new Error("Not allowed by CORS"));
     }
-  }
+  },
 };
 
 module.exports = {
-  corsConfig
+  corsConfig,
 };

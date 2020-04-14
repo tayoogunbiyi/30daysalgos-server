@@ -1,15 +1,15 @@
-const rolesWeightMap = require('../constants/rolesWeightMap');
+const rolesWeightMap = require("../constants/rolesWeightMap");
 
 const { ADMIN, SUPERADMIN } = rolesWeightMap;
 
-const NOT_PERMITTED_MSG = 'You are not permitted to perform this operation';
+const NOT_PERMITTED_MSG = "You are not permitted to perform this operation";
 
 const cleanUserRole = (role) => {
-    if (role == undefined || role == null || !(role in rolesWeightMap)){
-        return 'USER';
-    }
-    return role;
-}
+  if (role == undefined || role == null || !(role in rolesWeightMap)) {
+    return "USER";
+  }
+  return role;
+};
 
 const isAdminOrGreater = (req, res, next) => {
   const currentUserRole = cleanUserRole(req.user.role);
@@ -27,7 +27,6 @@ const isSuperAdminOrGreater = (req, res, next) => {
   }
   return next();
 };
-
 
 module.exports = {
   isAdminOrGreater,
