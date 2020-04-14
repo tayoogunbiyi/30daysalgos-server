@@ -101,7 +101,7 @@ router.get("/:id", userCanViewQuestion, async (req, res) => {
   try {
     const { id } = req.params;
     checkValidId(id);
-    await checkValidIdOnObj(id,Question);
+    await checkValidIdOnObj(id, Question);
     const question = await Question.findQ(id).populate("examples");
     if (!question) throw Error("Question Not Found!");
     return res.json(
@@ -129,7 +129,7 @@ router.put(
   async (req, res) => {
     const { id } = req.params;
     try {
-      checkValidIdOnObj(id, Question);
+      await checkValidIdOnObj(id, Question);
       const question = await Question.updateQ(id, req.body);
       return res.json(
         buildResponse(
@@ -235,6 +235,24 @@ router.put(
   }
 );
 
-router.delete("examples/:id");
+router.delete("/examples/:id", isAdminOrGreater, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await checkValidIdOnObj(id, Example);
+    const result = await Example.deleteOne({ _id: id });
+    if (!result.deletedCount) throw Error("Unable to delete example");
+    return res.json(
+      buildResponse(
+        `Deleted question with ${id} ${messages.SUCCESS_MESSAGE}`,
+        null,
+        true
+      )
+    );
+  } catch (error) {
+    res
+      .status(400)
+      .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
+  }
+});
 
 module.exports = router;

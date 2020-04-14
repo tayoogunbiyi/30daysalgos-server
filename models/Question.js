@@ -66,7 +66,6 @@ QuestionSchema.statics.getAllQuestionsBefore = function (date) {
 
 QuestionSchema.statics.deleteQ = function (id) {
   checkValidId(id);
-  console.log(id);
   return this.deleteOne({ _id: id });
 };
 
