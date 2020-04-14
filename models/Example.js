@@ -23,4 +23,15 @@ ExampleSchema.methods.toJSON = function () {
   return obj;
 };
 
+ExampleSchema.statics.updateEx = async function (id, data) {
+  return this.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    data,
+    {
+      new: true,
+    }
+  );
+};
 module.exports = mongoose.model("Example", ExampleSchema);

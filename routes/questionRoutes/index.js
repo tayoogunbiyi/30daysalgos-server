@@ -11,6 +11,7 @@ const {
   questionSchema,
   questionUpdateSchema,
   exampleSchema,
+  exampleUpdateSchema,
 } = require("../../validation/validationSchemas");
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
@@ -100,6 +101,7 @@ router.get("/:id", userCanViewQuestion, async (req, res) => {
   try {
     const { id } = req.params;
     checkValidId(id);
+    await checkValidIdOnObj(id,Question);
     const question = await Question.findQ(id).populate("examples");
     if (!question) throw Error("Question Not Found!");
     return res.json(
@@ -127,7 +129,7 @@ router.put(
   async (req, res) => {
     const { id } = req.params;
     try {
-      checkValidId(id);
+      checkValidIdOnObj(id, Question);
       const question = await Question.updateQ(id, req.body);
       return res.json(
         buildResponse(
@@ -152,7 +154,8 @@ router.put(
 router.delete("/:id", isAdminOrGreater, async (req, res) => {
   try {
     const { id } = req.params;
-    checkValidId(id);
+    //checkValidId(id);
+    await checkValidIdOnObj(id, Question);
     const result = await Question.deleteQ(id);
     if (!result.deletedCount) throw Error("Unable to delete question");
     return res.json(
@@ -176,7 +179,7 @@ router.post(
   async (req, res) => {
     const { id } = req.params;
     try {
-      checkValidIdOnObj(id, Question);
+      await checkValidIdOnObj(id, Example);
       const example = await Example.create(req.body);
       const q = await Question.findQ(id);
       q.examples.push(example._id);
@@ -202,4 +205,36 @@ router.post(
     }
   }
 );
+
+router.put(
+  "/examples/:id",
+  joiValidate(exampleUpdateSchema),
+  isAdminOrGreater,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      await checkValidIdOnObj(id, Example);
+      const example = await Example.updateEx(id, req.body);
+      return res.json(
+        buildResponse(
+          `Updated example with ${id} ${messages.SUCCESS_MESSAGE}!!!`,
+          example,
+          true
+        )
+      );
+    } catch (error) {
+      console.log("Error!??", error.message);
+      res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR),
+          null,
+          false
+        );
+    }
+  }
+);
+
+router.delete("examples/:id");
+
 module.exports = router;

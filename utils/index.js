@@ -16,13 +16,14 @@ const checkValidId = (__id) => {
   if (!ObjectId.isValid(__id)) {
     throw new Error("Invalid Question Id");
   }
-  return true;
+  return true
 };
 
 const checkValidIdOnObj = async (__id, model) => {
   checkValidId(__id);
   const exists = await model.exists({ _id: __id });
-  return exists;
+  if (!exists) throw new Error(`Object with id ${__id} does not exist!`);
+
 };
 
 module.exports = {
