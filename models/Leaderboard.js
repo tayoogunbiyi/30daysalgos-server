@@ -5,8 +5,9 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const LeaderboardSchema = new Schema({
-  userId: {
+  user: {
     type: Schema.Types.ObjectId,
+    ref: "User",
     required: true,
     unique: true,
   },
@@ -23,10 +24,10 @@ LeaderboardSchema.methods.toJSON = function () {
 };
 
 LeaderboardSchema.statics.updateUserPoints = async function (userId, points) {
-  const userPointMapping = await this.findOne({ userId });
+  const userPointMapping = await this.findOne({ user: userId });
   if (!userPointMapping) {
     const newUserPointMapping = new this();
-    newUserPointMapping.userId = userId;
+    newUserPointMapping.user = userId;
     newUserPointMapping.points = points;
     await newUserPointMapping.save();
     return points;
