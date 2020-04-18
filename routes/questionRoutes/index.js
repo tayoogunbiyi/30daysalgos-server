@@ -1,11 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
+
+const fileUpload = require("express-fileupload");
 const {
   isAdminOrGreater,
   userCanViewQuestion,
 } = require("../../middleware/rolesMiddleware");
 const { joiValidate } = require("express-joi");
 
+const { submissionController } = require("./questionSubmission");
 const { checkValidId, checkValidIdOnObj } = require("../../utils/");
 const {
   questionSchema,
@@ -16,12 +19,32 @@ const {
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
 
+const { FILE_UPLOADER_CONFIG } = require("../../constants/uploads");
+
 const { buildDuplicateMessage } = messages;
 const Question = mongoose.model("Question");
 const Example = mongoose.model("Example");
 
 const router = express.Router();
 
+router.post(
+  "/submit/:id",
+  fileUpload(FILE_UPLOADER_CONFIG),
+  async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      await checkValidIdOnObj(id, Question);
+      next();
+    } catch (error) {
+      return res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR, null, false)
+        );
+    }
+  },
+  submissionController
+);
 router.get("/", async (req, res) => {
   try {
     const questionsBeforeCurrTime = await Question.getAllQuestionsBefore(
