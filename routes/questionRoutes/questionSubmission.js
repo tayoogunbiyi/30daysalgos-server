@@ -1,10 +1,18 @@
+const mongoose = require("mongoose");
+
+const Leaderboard = mongoose.model("Leaderboard");
+
 const { buildResponse } = require("../../services/responseBuilder");
 
 const submissionController = (req, res) => {
   const fileObj = req.files["submission"];
   console.log(`Received file ${fileObj.name}.`);
-  console.log(req.user);
-  return res.status(200).json(
+  // ensure multiple submissions don't count.
+  // console.log(req.user);
+  Leaderboard.updateUserPoints(req.user.id, 10);
+  // skeptical about leaving it here... delays users request
+
+  res.status(200).json(
     buildResponse(
       "Submitted succesfully",
       {
@@ -15,6 +23,7 @@ const submissionController = (req, res) => {
       true
     )
   );
+  Leaderboard.sortAndSave();
 };
 
 module.exports = {
