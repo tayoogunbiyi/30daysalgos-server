@@ -237,7 +237,7 @@ router.put(
     const { id } = req.params;
     try {
       await checkValidIdOnObj(id, Example);
-      const example = await Example.updateEx(id, req.body);
+      const example = await Example.updateExample(id, req.body);
       return res.json(
         buildResponse(
           `Updated example with ${id} ${messages.SUCCESS_MESSAGE}!!!`,
