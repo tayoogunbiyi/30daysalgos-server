@@ -33,7 +33,7 @@ const UserSchema = new Schema({
 
 UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
-  const fieldsToDelete = ["password", "__v ", "active"];
+  const fieldsToDelete = ["password", "__v ", "active", "role"];
   fieldsToDelete.forEach((field) => {
     delete obj[field];
   });
