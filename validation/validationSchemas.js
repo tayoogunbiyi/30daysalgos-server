@@ -16,6 +16,7 @@ const questionSchema = {
   title: Joi.string().required(),
   description: Joi.string().required(),
   visibleBy: Joi.date().required(),
+  hint: Joi.string().default(""),
 };
 
 const questionUpdateSchema = {
@@ -24,6 +25,7 @@ const questionUpdateSchema = {
   title: Joi.string(),
   description: Joi.string(),
   visibleBy: Joi.date(),
+  hint: Joi.string(),
 };
 
 const exampleSchema = {
