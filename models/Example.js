@@ -23,7 +23,7 @@ ExampleSchema.methods.toJSON = function () {
   return obj;
 };
 
-ExampleSchema.statics.updateEx = async function (id, data) {
+ExampleSchema.statics.updateExample = async function (id, data) {
   return this.findOneAndUpdate(
     {
       _id: id,

@@ -19,9 +19,7 @@ db.once("open", () => {
 const port = process.env.PORT || 5000;
 
 const app = express();
-
 app.use(cors(corsConfig));
-
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
