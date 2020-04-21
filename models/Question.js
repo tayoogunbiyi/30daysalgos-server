@@ -27,6 +27,10 @@ const QuestionSchema = new Schema({
     required: true,
     unique: true,
   },
+  hint: {
+    type: String,
+    default: "",
+  },
   examples: [
     {
       type: Schema.Types.ObjectId,
