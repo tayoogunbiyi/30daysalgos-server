@@ -78,6 +78,18 @@ UserSchema.methods.generateOauthJWT = async function () {
   }
 };
 
+UserSchema.statics.updateUser = async function (id, data) {
+  return this.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    data,
+    {
+      new: true,
+    }
+  );
+};
+
 UserSchema.statics.createSocialUser = async function (token, profile) {
   const { displayName: name, emails } = profile;
   const email = emails[0].value;
