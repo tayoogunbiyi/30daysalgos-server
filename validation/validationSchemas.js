@@ -12,6 +12,10 @@ const registrationSchema = {
   name: Joi.string().required(),
 };
 
+const userUpdateSchema = {
+  name: Joi.string(),
+};
+
 const questionSchema = {
   title: Joi.string().required(),
   description: Joi.string().required(),
@@ -49,4 +53,5 @@ module.exports = {
   exampleSchema,
   exampleUpdateSchema,
   questionUpdateSchema,
+  userUpdateSchema,
 };
