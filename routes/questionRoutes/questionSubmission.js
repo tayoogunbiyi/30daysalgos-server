@@ -25,7 +25,6 @@ const submissionController = (req, res) => {
       true
     )
   );
-  Leaderboard.sortAndSave();
 };
 
 module.exports = {
