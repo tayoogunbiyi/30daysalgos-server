@@ -24,6 +24,7 @@ const { FILE_UPLOADER_CONFIG } = require("../../constants/uploads");
 const { buildDuplicateMessage } = messages;
 const Question = mongoose.model("Question");
 const Example = mongoose.model("Example");
+const Submission = mongoose.model("Submission");
 
 const router = express.Router();
 
@@ -50,10 +51,18 @@ router.get("/", async (req, res) => {
     const questionsBeforeCurrTime = await Question.getAllQuestionsBefore(
       Date.now()
     );
+    const completedQuestions = await Submission.find(
+      {
+        user: req.user.id,
+        completed: true,
+      },
+      "completed -_id"
+    ).populate("question", "title _id");
+
     return res.json(
       buildResponse(
         `Fetched questions before ${Date.now()} ${messages.SUCCESS_MESSAGE}`,
-        questionsBeforeCurrTime,
+        { questions: questionsBeforeCurrTime, completedQuestions },
         true
       )
     );
