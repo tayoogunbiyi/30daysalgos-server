@@ -14,6 +14,7 @@ const TestCaseSchema = new Schema({
   question: {
     type: Schema.Types.ObjectId,
     ref: "Question",
+    required: true,
   },
 });
 
@@ -39,6 +40,10 @@ TestCaseSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj["__v "];
   return obj;
+};
+
+TestCaseSchema.statics.deleteTestCase = function (id) {
+  return this.deleteOne({ _id: id });
 };
 
 module.exports = mongoose.model("TestCase", TestCaseSchema);
