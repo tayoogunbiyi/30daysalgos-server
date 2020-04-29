@@ -36,6 +36,18 @@ TestCaseSchema.statics.testAgainst = async function (questionId, userSolution) {
   return { passedTestCases, totalTestCases: testCases.length };
 };
 
+TestCaseSchema.statics.updateTestCase = async function (id, data) {
+  return this.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    data,
+    {
+      new: true,
+    }
+  );
+};
+
 TestCaseSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj["__v "];

@@ -16,6 +16,7 @@ const {
   exampleSchema,
   exampleUpdateSchema,
   testCaseSchema,
+  testCaseUpdateSchema,
 } = require("../../validation/validationSchemas");
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
@@ -364,5 +365,35 @@ router.get("/:id/testcase", isAdminOrGreater, async (req, res) => {
       .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
   }
 });
+
+router.put(
+  "/:id/testcase/:testCaseId",
+  isAdminOrGreater,
+  joiValidate(testCaseUpdateSchema),
+  async (req, res) => {
+    const { id, testCaseId } = req.params;
+    try {
+      await checkValidIdOnObj(id, Question);
+      await checkValidIdOnObj(testCaseId, TestCase);
+      const testcase = await TestCase.updateTestCase(testCaseId, req.body);
+      return res.json(
+        buildResponse(
+          `Updated testcase with ${id} ${messages.SUCCESS_MESSAGE}`,
+          testcase,
+          true
+        )
+      );
+    } catch (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR),
+          null,
+          false
+        );
+    }
+  }
+);
 
 module.exports = router;
