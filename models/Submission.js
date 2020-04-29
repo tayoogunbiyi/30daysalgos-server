@@ -17,6 +17,12 @@ const SubmissionSchema = new Schema({
     type: Schema.Types.Number,
     default: 1,
   },
+  completed: {
+    type: Schema.Types.Boolean,
+    // default will later be changed to false.
+    // true for dev purposes
+    default: true,
+  },
   maxpointsObtained: {
     type: Schema.Types.Number,
     default: 0,

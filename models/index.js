@@ -3,6 +3,7 @@ const Leaderboard = require("./Leaderboard");
 const Example = require("./Example");
 const Question = require("./Question");
 const Submission = require("./Submission");
+const TestCase = require("./TestCase");
 
 module.exports = {
   User,
@@ -10,4 +11,5 @@ module.exports = {
   Question,
   Submission,
   Leaderboard,
+  TestCase,
 };

@@ -42,11 +42,26 @@ const exampleUpdateSchema = {
   explanation: Joi.string(),
 };
 
+const testCaseUpdateSchema = {
+  id: Joi.string().required(),
+  testCaseId: Joi.string().required(),
+  input: Joi.string(),
+  expectedOutput: Joi.string(),
+};
+
+const testCaseSchema = {
+  id: Joi.string().required(),
+  input: Joi.string().required(),
+  expectedOutput: Joi.string().required(),
+};
+
 module.exports = {
   registrationSchema,
   loginSchema,
   questionSchema,
   exampleSchema,
+  testCaseUpdateSchema,
   exampleUpdateSchema,
   questionUpdateSchema,
+  testCaseSchema,
 };

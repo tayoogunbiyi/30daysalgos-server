@@ -15,6 +15,8 @@ const {
   questionUpdateSchema,
   exampleSchema,
   exampleUpdateSchema,
+  testCaseSchema,
+  testCaseUpdateSchema,
 } = require("../../validation/validationSchemas");
 const messages = require("../../services/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
@@ -22,8 +24,10 @@ const { buildResponse } = require("../../services/responseBuilder");
 const { FILE_UPLOADER_CONFIG } = require("../../constants/uploads");
 
 const { buildDuplicateMessage } = messages;
+const TestCase = mongoose.model("TestCase");
 const Question = mongoose.model("Question");
 const Example = mongoose.model("Example");
+const Submission = mongoose.model("Submission");
 
 const router = express.Router();
 
@@ -50,10 +54,18 @@ router.get("/", async (req, res) => {
     const questionsBeforeCurrTime = await Question.getAllQuestionsBefore(
       Date.now()
     );
+    const completedQuestions = await Submission.find(
+      {
+        user: req.user.id,
+        completed: true,
+      },
+      "completed -_id"
+    ).populate("question", "title _id");
+
     return res.json(
       buildResponse(
         `Fetched questions before ${Date.now()} ${messages.SUCCESS_MESSAGE}`,
-        questionsBeforeCurrTime,
+        { questions: questionsBeforeCurrTime, completedQuestions },
         true
       )
     );
@@ -277,5 +289,111 @@ router.delete("/examples/:id", isAdminOrGreater, async (req, res) => {
       .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
   }
 });
+
+router.post(
+  "/:id/testcase",
+  isAdminOrGreater,
+  joiValidate(testCaseSchema),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      await checkValidId(id, Question);
+      const testcase = await TestCase.create({ ...req.body, question: id });
+      return res
+        .status(201)
+        .json(
+          buildResponse(
+            `Created testcase ${messages.SUCCESS_MESSAGE}`,
+            testcase,
+            true
+          )
+        );
+    } catch (error) {
+      return res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR, null, false)
+        );
+    }
+  }
+);
+
+router.delete(
+  "/:id/testcase/:testCaseId",
+  isAdminOrGreater,
+  async (req, res) => {
+    try {
+      const { id, testCaseId } = req.params;
+      await checkValidIdOnObj(id, Question);
+      await checkValidIdOnObj(testCaseId, TestCase);
+      const result = await TestCase.deleteTestCase(testCaseId);
+      if (!result.deletedCount) throw Error("Unable to delete testcase");
+      return res.json(
+        buildResponse(
+          `Deleted testcase with ${testCaseId} ${messages.SUCCESS_MESSAGE}`,
+          null,
+          true
+        )
+      );
+    } catch (error) {
+      res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR),
+          null,
+          false
+        );
+    }
+  }
+);
+
+router.get("/:id/testcase", isAdminOrGreater, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await checkValidIdOnObj(id, Question);
+    const testCases = await TestCase.find({ question: id });
+    return res.json(
+      buildResponse(
+        `Fetched testcases ${messages.SUCCESS_MESSAGE}`,
+        testCases,
+        true
+      )
+    );
+  } catch (error) {
+    res
+      .status(400)
+      .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
+  }
+});
+
+router.put(
+  "/:id/testcase/:testCaseId",
+  isAdminOrGreater,
+  joiValidate(testCaseUpdateSchema),
+  async (req, res) => {
+    const { id, testCaseId } = req.params;
+    try {
+      await checkValidIdOnObj(id, Question);
+      await checkValidIdOnObj(testCaseId, TestCase);
+      const testcase = await TestCase.updateTestCase(testCaseId, req.body);
+      return res.json(
+        buildResponse(
+          `Updated testcase with ${id} ${messages.SUCCESS_MESSAGE}`,
+          testcase,
+          true
+        )
+      );
+    } catch (error) {
+      console.log(error);
+      res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR),
+          null,
+          false
+        );
+    }
+  }
+);
 
 module.exports = router;

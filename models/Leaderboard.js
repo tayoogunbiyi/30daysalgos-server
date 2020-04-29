@@ -37,13 +37,13 @@ LeaderboardSchema.statics.updateUserPoints = async function (userId, points) {
   return userPointMapping.points;
 };
 
-LeaderboardSchema.statics.sortAndSave = async function () {
-  try {
-    const leaderboard = await LeaderboardSchema.find({}).sort("points");
-    this.save(leaderboard);
-  } catch (error) {
-    return null;
-  }
-};
+// LeaderboardSchema.statics.sortAndSave = async function () {
+//   try {
+//     const leaderboard = await LeaderboardSchema.find({}).sort("points");
+//     this.save(leaderboard);
+//   } catch (error) {
+//     return null;
+//   }
+// };
 
 module.exports = mongoose.model("Leaderboard", LeaderboardSchema);
