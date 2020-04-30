@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const DEFAULT_PROFILE_PICTURE_URL = "https://via.placeholder.com/150";
+
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -28,6 +30,10 @@ const UserSchema = new Schema({
     type: String,
     enum: ["ADMIN", "SUPERADMIN", "USER"],
     default: "USER",
+  },
+  pictureUrl: {
+    type: Schema.Types.String,
+    default: DEFAULT_PROFILE_PICTURE_URL,
   },
 });
 
@@ -79,10 +85,18 @@ UserSchema.methods.generateOauthJWT = async function () {
 };
 
 UserSchema.statics.createSocialUser = async function (token, profile) {
-  const { displayName: name, emails } = profile;
+  const { displayName: name, emails, _json } = profile;
+  const { picture: pictureUrl } = _json;
   const email = emails[0].value;
   const user = await this.findOne({ email });
-  if (user) return user;
+  if (user) {
+    if (user.pictureUrl !== DEFAULT_PROFILE_PICTURE_URL || !pictureUrl) {
+      return user;
+    }
+    user.pictureUrl = pictureUrl;
+    await user.save();
+    return user;
+  }
   const hashedToken = await this.generateHash(token);
   if (!hashedToken) throw new Error("Unable to create new user");
   try {
@@ -90,6 +104,7 @@ UserSchema.statics.createSocialUser = async function (token, profile) {
     newUser.email = email;
     newUser.name = name;
     newUser.password = hashedToken;
+    newUser.pictureUrl = pictureUrl;
     newUser.save();
     return newUser;
   } catch (e) {
