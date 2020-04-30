@@ -29,7 +29,7 @@ const QuestionSchema = new Schema({
   },
   hint: {
     type: String,
-    default: "",
+    default: "No hint available!",
   },
   examples: [
     {
