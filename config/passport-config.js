@@ -20,6 +20,7 @@ module.exports = (passport) => {
               name: user.name,
               email: user.email,
               pictureUrl: user.pictureUrl,
+              role: user.role,  
             });
           }
           return done(null, false);

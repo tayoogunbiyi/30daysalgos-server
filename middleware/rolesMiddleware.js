@@ -16,7 +16,7 @@ const cleanUserRole = (role) => {
 
 const isAdminOrGreater = (req, res, next) => {
   const currentUserRole = cleanUserRole(req.user.role);
-
+  console.log(currentUserRole, req.user);
   if (ADMIN > rolesWeightMap[currentUserRole]) {
     return res.status(403).json({ message: NOT_PERMITTED_MSG });
   }
