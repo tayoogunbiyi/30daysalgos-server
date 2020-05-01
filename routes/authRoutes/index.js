@@ -7,7 +7,7 @@ const {
   registrationSchema,
   loginSchema,
 } = require("../../validation/validationSchemas");
-const messages = require("../../services/responseMessages");
+const messages = require("../../constants/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
 const router = express.Router();
 
