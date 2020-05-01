@@ -31,6 +31,10 @@ const QuestionSchema = new Schema({
     type: String,
     default: "No hint available!",
   },
+  pointsObtainable: {
+    type: Number,
+    default: 20,
+  },
   examples: [
     {
       type: Schema.Types.ObjectId,
@@ -45,6 +49,26 @@ QuestionSchema.methods.toJSON = function () {
   // obj['day'] = this.day;
   delete obj["__v "];
   return obj;
+};
+
+QuestionSchema.statics.getDuePoints = async function (
+  id,
+  passedTestCases,
+  totalTestCases
+) {
+  try {
+    const q = await this.findById(id);
+    const multiplier = passedTestCases / totalTestCases;
+    if (multiplier === Infinity) {
+      throw new Error("Invalid total test cases");
+    }
+    if (!q || q === undefined || q === null) {
+      throw new Error("Invalid question id");
+    }
+    return Math.floor(multiplier * q.pointsObtainable);
+  } catch (error) {
+    throw new Error(error.message || "An error occured.");
+  }
 };
 
 QuestionSchema.statics.findQ = function (id) {
