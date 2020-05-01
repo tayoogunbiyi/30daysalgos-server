@@ -1,6 +1,4 @@
-const mongoose = require("mongoose");
 const express = require("express");
-
 // const User = mongoose.model("User");
 
 const { buildResponse } = require("../../services/responseBuilder");
