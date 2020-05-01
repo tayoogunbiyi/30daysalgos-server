@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const fileUpload = require("express-fileupload");
+// const fileUpload = require("express-fileupload");
 const {
   isAdminOrGreater,
   userCanViewQuestion,
@@ -15,13 +15,14 @@ const {
   questionUpdateSchema,
   exampleSchema,
   exampleUpdateSchema,
+  submissionSchema,
   testCaseSchema,
   testCaseUpdateSchema,
 } = require("../../validation/validationSchemas");
-const messages = require("../../services/responseMessages");
+const messages = require("../../constants/responseMessages");
 const { buildResponse } = require("../../services/responseBuilder");
 
-const { FILE_UPLOADER_CONFIG } = require("../../constants/uploads");
+// const { FILE_UPLOADER_CONFIG } = require("../../constants/uploads");
 
 const { buildDuplicateMessage } = messages;
 const TestCase = mongoose.model("TestCase");
@@ -33,7 +34,7 @@ const router = express.Router();
 
 router.post(
   "/submit/:id",
-  fileUpload(FILE_UPLOADER_CONFIG),
+  joiValidate(submissionSchema),
   async (req, res, next) => {
     const { id } = req.params;
     try {

@@ -22,7 +22,7 @@ TestCaseSchema.statics.testAgainst = async function (questionId, userSolution) {
   const testCases = await this.find({ question: questionId });
   if (testCases.length != userSolution.length) {
     throw new Error(
-      `Expected input of length ${testCases.length} and got length of ${userSolution.length}`
+      `Expected submission input of length ${testCases.length} and got length of ${userSolution.length}`
     );
   }
   let passedTestCases = 0;

@@ -1,37 +1,47 @@
 const mongoose = require("mongoose");
+const { SERVER_ERROR } = require("../../constants/responseMessages");
 
 const User = mongoose.model("User");
+const Question = mongoose.model("Question");
 const Leaderboard = mongoose.model("Leaderboard");
 const Submission = mongoose.model("Submission");
+const TestCase = mongoose.model("TestCase");
 
 const { buildResponse } = require("../../services/responseBuilder");
 
-const submissionController = (req, res) => {
-  const fileObj = req.files["submission"];
-  console.log(`Received file ${fileObj.name}.`);
+const submissionController = async (req, res) => {
   const userId = req.user.id;
   const questionId = req.params.id;
-  const pointsObtained = 20;
-  Leaderboard.updateUserPoints(userId, pointsObtained);
-  Submission.createSubmission(userId, questionId, pointsObtained);
-
-  const totalTestCases = 5;
-  const passedTestCases = 2;
-  res.status(200).json(
-    buildResponse(
-      "Submitted succesfully",
-      {
-        totalTestCases,
-        passedTestCases,
-        points: pointsObtained,
-      },
-      true
-    )
-  );
-  if (totalTestCases == passedTestCases) {
-    
+  const { solution } = req.body;
+  try {
+    const submissionResult = await TestCase.testAgainst(questionId, solution);
+    // console.log(submissionResult);
+    const { passedTestCases, totalTestCases } = submissionResult;
+    const pointsObtained = await Question.getDuePoints(
+      questionId,
+      passedTestCases,
+      totalTestCases
+    );
+    await Submission.createSubmission(userId, questionId, pointsObtained);
+    if (pointsObtained !== 0) {
+      await Leaderboard.updateUserPoints(userId, pointsObtained);
+    }
+    res.status(200).json(
+      buildResponse(
+        "Submitted succesfully",
+        {
+          totalTestCases,
+          passedTestCases,
+          pointsObtained,
+        },
+        true
+      )
+    );
+  } catch (error) {
+    return res
+      .status(500)
+      .json(buildResponse(error.message || SERVER_ERROR, null, false));
   }
-  // Leaderboard.sortAndSave();
 };
 
 module.exports = {

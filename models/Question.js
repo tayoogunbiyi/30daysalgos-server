@@ -31,6 +31,10 @@ const QuestionSchema = new Schema({
     type: String,
     default: "No hint available!",
   },
+  pointsObtainable: {
+    type: Number,
+    default: 20,
+  },
   examples: [
     {
       type: Schema.Types.ObjectId,
@@ -41,10 +45,31 @@ const QuestionSchema = new Schema({
 
 QuestionSchema.methods.toJSON = function () {
   const obj = this.toObject();
+  obj["day"] = this.day;
   // implement day functionality
   // obj['day'] = this.day;
   delete obj["__v "];
   return obj;
+};
+
+QuestionSchema.statics.getDuePoints = async function (
+  id,
+  passedTestCases,
+  totalTestCases
+) {
+  try {
+    const q = await this.findById(id);
+    const multiplier = passedTestCases / totalTestCases;
+    if (multiplier === Infinity) {
+      throw new Error("Invalid total test cases");
+    }
+    if (!q || q === undefined || q === null) {
+      throw new Error("Invalid question id");
+    }
+    return Math.floor(multiplier * q.pointsObtainable);
+  } catch (error) {
+    throw new Error(error.message || "An error occured.");
+  }
 };
 
 QuestionSchema.statics.findQ = function (id) {
@@ -52,17 +77,19 @@ QuestionSchema.statics.findQ = function (id) {
   checkValidId(id);
   return this.findById(id);
 };
-// QuestionSchema.virtual('day').get(function(){
-//     const visibleBy = this.visibleBy;
-//     console.log(visibleBy-START_DATE)
-//     // converted to days by multiplying with 1.15741e-8
-//     const daysElapsedSinceStart = parseInt((visibleBy - START_DATE)*1.15741e-8)
-//     return daysElapsedSinceStart;
-// });
+
+QuestionSchema.virtual("day").get(function () {
+  const { visibleBy } = this;
+  // converted to days by multiplying with 1.15741e-8
+  const daysElapsedSinceStart = parseInt((visibleBy - START_DATE) * 1.15741e-8);
+  return daysElapsedSinceStart;
+});
 
 QuestionSchema.statics.getAllQuestionsBefore = function (date) {
   try {
-    return this.find({ visibleBy: { $lte: date } }).populate("examples");
+    return this.find({ visibleBy: { $lte: date } })
+      .sort("visibleBy")
+      .populate("examples");
   } catch (error) {
     throw new Error("Could not fetch questions");
   }

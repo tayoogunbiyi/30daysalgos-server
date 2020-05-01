@@ -1,4 +1,5 @@
 const expressJoi = require("express-joi");
+const { START_DATE } = require("../constants/questions");
 
 const { Joi } = expressJoi;
 
@@ -10,6 +11,11 @@ const loginSchema = {
 const registrationSchema = {
   ...loginSchema,
   name: Joi.string().required(),
+};
+
+const submissionSchema = {
+  id: Joi.string().required(),
+  solution: Joi.array().min(1).required(),
 };
 
 const questionSchema = {
@@ -64,4 +70,5 @@ module.exports = {
   exampleUpdateSchema,
   questionUpdateSchema,
   testCaseSchema,
+  submissionSchema,
 };
