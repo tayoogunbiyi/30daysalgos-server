@@ -45,6 +45,7 @@ const QuestionSchema = new Schema({
 
 QuestionSchema.methods.toJSON = function () {
   const obj = this.toObject();
+  obj["day"] = this.day;
   // implement day functionality
   // obj['day'] = this.day;
   delete obj["__v "];
@@ -76,17 +77,19 @@ QuestionSchema.statics.findQ = function (id) {
   checkValidId(id);
   return this.findById(id);
 };
-// QuestionSchema.virtual('day').get(function(){
-//     const visibleBy = this.visibleBy;
-//     console.log(visibleBy-START_DATE)
-//     // converted to days by multiplying with 1.15741e-8
-//     const daysElapsedSinceStart = parseInt((visibleBy - START_DATE)*1.15741e-8)
-//     return daysElapsedSinceStart;
-// });
+
+QuestionSchema.virtual("day").get(function () {
+  const { visibleBy } = this;
+  // converted to days by multiplying with 1.15741e-8
+  const daysElapsedSinceStart = parseInt((visibleBy - START_DATE) * 1.15741e-8);
+  return daysElapsedSinceStart;
+});
 
 QuestionSchema.statics.getAllQuestionsBefore = function (date) {
   try {
-    return this.find({ visibleBy: { $lte: date } }).populate("examples");
+    return this.find({ visibleBy: { $lte: date } })
+      .sort("visibleBy")
+      .populate("examples");
   } catch (error) {
     throw new Error("Could not fetch questions");
   }
