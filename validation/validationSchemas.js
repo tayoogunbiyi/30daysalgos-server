@@ -12,6 +12,11 @@ const registrationSchema = {
   name: Joi.string().required(),
 };
 
+const submissionSchema = {
+  id: Joi.string().required(),
+  solution: Joi.array().min(1).required(),
+};
+
 const questionSchema = {
   title: Joi.string().required(),
   description: Joi.string().required(),
@@ -64,4 +69,5 @@ module.exports = {
   exampleUpdateSchema,
   questionUpdateSchema,
   testCaseSchema,
+  submissionSchema,
 };
