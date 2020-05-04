@@ -31,10 +31,11 @@ LeaderboardSchema.statics.updateUserPoints = async function (userId, points) {
     newUserPointMapping.points = points;
     await newUserPointMapping.save();
     return points;
+  } else {
+    userPointMapping.points = Math.max(userPointMapping.points, points);
+    await userPointMapping.save();
+    return userPointMapping.points;
   }
-  userPointMapping.points += points;
-  await userPointMapping.save();
-  return userPointMapping.points;
 };
 
 // LeaderboardSchema.statics.sortAndSave = async function () {
