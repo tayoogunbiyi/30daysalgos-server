@@ -10,7 +10,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   const leaderboard = await Leaderboard.find({})
     .sort("-points")
-    .populate("user", "name email");
+    .populate("user", "name email pictureUrl");
   return res.json(
     buildResponse(
       `Leaderboard fetched succesfully.`,
