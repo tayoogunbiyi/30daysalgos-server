@@ -4,8 +4,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const DEFAULT_PROFILE_PICTURE_URL = "https://via.placeholder.com/150";
-
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -33,7 +31,7 @@ const UserSchema = new Schema({
   },
   pictureUrl: {
     type: Schema.Types.String,
-    default: DEFAULT_PROFILE_PICTURE_URL,
+    default: "",
   },
 });
 
@@ -90,7 +88,7 @@ UserSchema.statics.createSocialUser = async function (token, profile) {
   const email = emails[0].value;
   const user = await this.findOne({ email });
   if (user) {
-    if (user.pictureUrl !== DEFAULT_PROFILE_PICTURE_URL || !pictureUrl) {
+    if (!pictureUrl) {
       return user;
     }
     user.pictureUrl = pictureUrl;
