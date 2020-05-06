@@ -18,6 +18,8 @@ const TestCaseSchema = new Schema({
   },
 });
 
+TestCaseSchema.index({ question: 1, input: 1 }, { unique: true });
+
 TestCaseSchema.statics.testAgainst = async function (questionId, userSolution) {
   const testCases = await this.find({ question: questionId });
   if (testCases.length != userSolution.length) {
