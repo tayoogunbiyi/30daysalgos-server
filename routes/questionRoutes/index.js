@@ -300,6 +300,7 @@ router.post(
     try {
       await checkValidId(id, Question);
       const testcase = await TestCase.create({ ...req.body, question: id });
+      await Question.addTestCase(id, testcase._id);
       return res
         .status(201)
         .json(

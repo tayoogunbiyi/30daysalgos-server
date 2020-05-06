@@ -58,6 +58,17 @@ QuestionSchema.methods.toJSON = function () {
   return obj;
 };
 
+QuestionSchema.statics.addTestCase = async function (questionId, testCaseId) {
+  try {
+    if (!testCaseId) throw new Error("Invalid testcase id");
+    const q = await this.findById(questionId);
+    q.testCases.push(testCaseId);
+    await q.save();
+  } catch (error) {
+    throw new Error(error.message || "An error occured while saving testcase.");
+  }
+};
+
 QuestionSchema.statics.getDuePoints = async function (
   id,
   passedTestCases,
@@ -95,7 +106,8 @@ QuestionSchema.statics.getAllQuestionsBefore = function (date) {
   try {
     return this.find({ visibleBy: { $lte: date } })
       .sort("visibleBy")
-      .populate("examples");
+      .populate("examples")
+      .populate("testCases", "input");
   } catch (error) {
     throw new Error("Could not fetch questions");
   }
