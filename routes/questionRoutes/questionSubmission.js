@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { SERVER_ERROR } = require("../../constants/responseMessages");
 
-const User = mongoose.model("User");
 const Question = mongoose.model("Question");
 const Leaderboard = mongoose.model("Leaderboard");
 const Submission = mongoose.model("Submission");
