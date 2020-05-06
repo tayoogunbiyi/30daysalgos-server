@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
+const validator = require("express-joi-validation").createValidator({});
 const User = mongoose.model("User");
-const { joiValidate } = require("express-joi");
 const {
   registrationSchema,
   loginSchema,
@@ -36,7 +36,7 @@ router.post(
   }
 );
 
-router.post("/register", joiValidate(registrationSchema), async (req, res) => {
+router.post("/register", validator.body(registrationSchema), async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (user) {
     return res.status(400).json(buildResponse(messages.EMAIL_NOT_AVAILABLE));
@@ -64,7 +64,7 @@ router.post("/register", joiValidate(registrationSchema), async (req, res) => {
   }
 });
 
-router.post("/login", joiValidate(loginSchema), async (req, res) => {
+router.post("/login", validator.body(loginSchema), async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     const response = buildResponse(messages.INVALID_CREDENTIALS);
