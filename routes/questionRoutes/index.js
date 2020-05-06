@@ -40,7 +40,6 @@ router.post(
     const { id } = req.params;
     try {
       await checkValidIdOnObj(id, Question);
-      // return res.json({ success: true });
       next();
     } catch (error) {
       return res
