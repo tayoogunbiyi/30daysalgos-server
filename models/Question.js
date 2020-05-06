@@ -3,7 +3,7 @@ const rolesWeightMap = require("../constants/rolesWeightMap");
 const { checkValidId } = require("../utils/");
 const { START_DATE } = require("../constants/questions");
 
-const { Schema, Types } = mongoose;
+const { Schema } = mongoose;
 const { ObjectId } = mongoose.Types;
 
 const ADMIN_WEIGHT = rolesWeightMap.ADMIN;
@@ -39,6 +39,12 @@ const QuestionSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Example",
+    },
+  ],
+  testCases: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "TestCase",
     },
   ],
 });
