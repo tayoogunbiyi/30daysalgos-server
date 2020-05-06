@@ -38,7 +38,6 @@ const exampleSchema = Joi.object({
 });
 
 const exampleUpdateSchema = Joi.object({
-  id: Joi.string().required(),
   input: Joi.string(),
   output: Joi.string(),
   explanation: Joi.string(),
