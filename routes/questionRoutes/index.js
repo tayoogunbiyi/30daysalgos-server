@@ -33,25 +33,25 @@ const Submission = mongoose.model("Submission");
 
 const router = express.Router();
 
-// router.post(
-//   "/submit/:id",
-//   joiValidate(submissionSchema),
-//   async (req, res, next) => {
-//     const { id } = req.params;
-//     try {
-//       await checkValidIdOnObj(id, Question);
-//       return res.json({ success: true });
-//       next();
-//     } catch (error) {
-//       return res
-//         .status(400)
-//         .json(
-//           buildResponse(error.message || messages.SERVER_ERROR, null, false)
-//         );
-//     }
-//   },
-//   submissionController
-// );
+router.post(
+  "/submit/:id",
+  validator.body(submissionSchema),
+  async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      await checkValidIdOnObj(id, Question);
+      // return res.json({ success: true });
+      next();
+    } catch (error) {
+      return res
+        .status(400)
+        .json(
+          buildResponse(error.message || messages.SERVER_ERROR, null, false)
+        );
+    }
+  },
+  submissionController
+);
 
 router.get("/", async (req, res) => {
   try {
@@ -323,8 +323,6 @@ router.post(
   }
 );
 
-
-
 router.delete(
   "/:id/testcase/:testCaseId",
   isAdminOrGreater,
@@ -372,7 +370,6 @@ router.get("/:id/testcase", isAdminOrGreater, async (req, res) => {
       .json(buildResponse(error.message || messages.SERVER_ERROR), null, false);
   }
 });
-
 
 router.put(
   "/:id/testcase/:testCaseId",
