@@ -18,18 +18,27 @@ const TestCaseSchema = new Schema({
   },
 });
 
+TestCaseSchema.index({ question: 1, input: 1 }, { unique: true });
+
 TestCaseSchema.statics.testAgainst = async function (questionId, userSolution) {
   const testCases = await this.find({ question: questionId });
-  if (testCases.length != userSolution.length) {
+  const expectedOutput = mapper(testCases, "input", "expectedOutput");
+  const userOutput = mapper(userSolution, "input", "output");
+
+  if (getObjLength(expectedOutput) !== getObjLength(userOutput)) {
     throw new Error(
-      `Expected submission input of length ${testCases.length} and got length of ${userSolution.length}`
+      `Expected submission input of length ${getObjLength(
+        expectedOutput
+      )} and got length of ${getObjLength(userOutput)} (unique inputs count)`
     );
   }
+
+  console.log(expectedOutput, userOutput);
   let passedTestCases = 0;
-  for (let j = 0; j < testCases.length; j++) {
-    const output = userSolution[j];
-    const { expectedOutput } = testCases[j];
-    if (output === expectedOutput) {
+  for (const key in expectedOutput) {
+    const userOp = userOutput[key];
+    const correctOp = expectedOutput[key];
+    if (correctOp === userOp) {
       passedTestCases += 1;
     }
   }
@@ -58,4 +67,17 @@ TestCaseSchema.statics.deleteTestCase = function (id) {
   return this.deleteOne({ _id: id });
 };
 
+const mapper = (objectsArray, key1, key2) => {
+  const newObj = {};
+  objectsArray.forEach((obj) => {
+    if (!(obj[key1] in newObj)) {
+      newObj[obj[key1]] = obj[key2];
+    }
+  });
+  return newObj;
+};
+
+const getObjLength = (obj) => {
+  return Object.keys(obj).length;
+};
 module.exports = mongoose.model("TestCase", TestCaseSchema);

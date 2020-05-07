@@ -3,7 +3,7 @@ const rolesWeightMap = require("../constants/rolesWeightMap");
 const { checkValidId } = require("../utils/");
 const { START_DATE } = require("../constants/questions");
 
-const { Schema, Types } = mongoose;
+const { Schema } = mongoose;
 const { ObjectId } = mongoose.Types;
 
 const ADMIN_WEIGHT = rolesWeightMap.ADMIN;
@@ -41,6 +41,12 @@ const QuestionSchema = new Schema({
       ref: "Example",
     },
   ],
+  testCases: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "TestCase",
+    },
+  ],
 });
 
 QuestionSchema.methods.toJSON = function () {
@@ -50,6 +56,17 @@ QuestionSchema.methods.toJSON = function () {
   // obj['day'] = this.day;
   delete obj["__v "];
   return obj;
+};
+
+QuestionSchema.statics.addTestCase = async function (questionId, testCaseId) {
+  try {
+    if (!testCaseId) throw new Error("Invalid testcase id");
+    const q = await this.findById(questionId);
+    q.testCases.push(testCaseId);
+    await q.save();
+  } catch (error) {
+    throw new Error(error.message || "An error occured while saving testcase.");
+  }
 };
 
 QuestionSchema.statics.getDuePoints = async function (
@@ -89,7 +106,8 @@ QuestionSchema.statics.getAllQuestionsBefore = function (date) {
   try {
     return this.find({ visibleBy: { $lte: date } })
       .sort("visibleBy")
-      .populate("examples");
+      .populate("examples")
+      .populate("testCases", "input");
   } catch (error) {
     throw new Error("Could not fetch questions");
   }

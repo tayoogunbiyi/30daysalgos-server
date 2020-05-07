@@ -1,65 +1,64 @@
-const expressJoi = require("express-joi");
+const Joi = require("@hapi/joi");
 const { START_DATE } = require("../constants/questions");
 
-const { Joi } = expressJoi;
-
-const loginSchema = {
+const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-};
+});
 
-const registrationSchema = {
-  ...loginSchema,
+const registrationSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
   name: Joi.string().required(),
-};
+});
 
-const submissionSchema = {
-  id: Joi.string().required(),
-  solution: Joi.array().min(1).required(),
-};
+const submissionSchema = Joi.object({
+  solution: Joi.array()
+    .items(
+      Joi.object({
+        input: Joi.string().required(),
+        output: Joi.string().required(),
+      })
+    )
+    .min(1)
+    .required(),
+});
 
-const questionSchema = {
+const questionSchema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
   visibleBy: Joi.date().required(),
   hint: Joi.string().default(""),
-};
+});
 
-const questionUpdateSchema = {
-  // id - url param
-  id: Joi.string().required(),
+const questionUpdateSchema = Joi.object({
   title: Joi.string(),
   description: Joi.string(),
   visibleBy: Joi.date(),
   hint: Joi.string(),
-};
+});
 
-const exampleSchema = {
-  id: Joi.string().required(),
+const exampleSchema = Joi.object({
   input: Joi.string().required(),
   output: Joi.string().required(),
   explanation: Joi.string().required(),
-};
+});
 
-const exampleUpdateSchema = {
-  id: Joi.string().required(),
+const exampleUpdateSchema = Joi.object({
   input: Joi.string(),
   output: Joi.string(),
   explanation: Joi.string(),
-};
+});
 
-const testCaseUpdateSchema = {
-  id: Joi.string().required(),
-  testCaseId: Joi.string().required(),
+const testCaseUpdateSchema = Joi.object({
   input: Joi.string(),
   expectedOutput: Joi.string(),
-};
+});
 
-const testCaseSchema = {
-  id: Joi.string().required(),
+const testCaseSchema = Joi.object({
   input: Joi.string().required(),
   expectedOutput: Joi.string().required(),
-};
+});
 
 module.exports = {
   registrationSchema,

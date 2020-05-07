@@ -6,7 +6,8 @@ const {
   isAdminOrGreater,
   userCanViewQuestion,
 } = require("../../middleware/rolesMiddleware");
-const { joiValidate } = require("express-joi");
+
+const validator = require("express-joi-validation").createValidator({});
 
 const { submissionController } = require("./questionSubmission");
 const { checkValidId, checkValidIdOnObj } = require("../../utils/");
@@ -34,7 +35,7 @@ const router = express.Router();
 
 router.post(
   "/submit/:id",
-  joiValidate(submissionSchema),
+  validator.body(submissionSchema),
   async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -50,6 +51,7 @@ router.post(
   },
   submissionController
 );
+
 router.get("/", async (req, res) => {
   try {
     const questionsBeforeCurrTime = await Question.getAllQuestionsBefore(
@@ -96,7 +98,7 @@ router.get("/all", isAdminOrGreater, async (req, res) => {
 
 router.post(
   "/",
-  joiValidate(questionSchema),
+  validator.body(questionSchema),
   isAdminOrGreater,
   async (req, res) => {
     try {
@@ -161,7 +163,7 @@ router.get("/:id", userCanViewQuestion, async (req, res) => {
 router.put(
   "/:id",
   isAdminOrGreater,
-  joiValidate(questionUpdateSchema),
+  validator.body(questionUpdateSchema),
   async (req, res) => {
     const { id } = req.params;
     try {
@@ -209,13 +211,13 @@ router.delete("/:id", isAdminOrGreater, async (req, res) => {
 });
 
 router.post(
-  "/:id/examples",
-  joiValidate(exampleSchema),
+  "/:id/example",
+  validator.body(exampleSchema),
   isAdminOrGreater,
   async (req, res) => {
     const { id } = req.params;
     try {
-      await checkValidIdOnObj(id, Example);
+      await checkValidIdOnObj(id, Question);
       const example = await Example.create(req.body);
       const q = await Question.findQ(id);
       q.examples.push(example._id);
@@ -225,7 +227,7 @@ router.post(
           `Created example successfully`,
           {
             example,
-            q,
+            question: q,
           },
           true
         )
@@ -244,7 +246,7 @@ router.post(
 
 router.put(
   "/examples/:id",
-  joiValidate(exampleUpdateSchema),
+  validator.body(exampleUpdateSchema),
   isAdminOrGreater,
   async (req, res) => {
     const { id } = req.params;
@@ -294,12 +296,13 @@ router.delete("/examples/:id", isAdminOrGreater, async (req, res) => {
 router.post(
   "/:id/testcase",
   isAdminOrGreater,
-  joiValidate(testCaseSchema),
+  validator.body(testCaseSchema),
   async (req, res) => {
     const { id } = req.params;
     try {
       await checkValidId(id, Question);
       const testcase = await TestCase.create({ ...req.body, question: id });
+      await Question.addTestCase(id, testcase._id);
       return res
         .status(201)
         .json(
@@ -370,7 +373,7 @@ router.get("/:id/testcase", isAdminOrGreater, async (req, res) => {
 router.put(
   "/:id/testcase/:testCaseId",
   isAdminOrGreater,
-  joiValidate(testCaseUpdateSchema),
+  validator.body(testCaseUpdateSchema),
   async (req, res) => {
     const { id, testCaseId } = req.params;
     try {
