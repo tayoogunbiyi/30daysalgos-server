@@ -3,6 +3,7 @@ const corsWhitelist = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://www.30daysofalgos.tech",
+  "https://www.30daysofalgos.tech",
 ];
 
 const corsConfig = {
