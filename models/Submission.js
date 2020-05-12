@@ -61,7 +61,9 @@ SubmissionSchema.statics.createSubmission = async function (
         pointsObtained
       );
       submission.attempts += 1;
-      submission.completed = pointsObtained === q.pointsObtainable;
+      if (!submission.completed) {
+        submission.completed = pointsObtained === q.pointsObtainable;
+      }
       await submission.save();
     }
   } catch (error) {
