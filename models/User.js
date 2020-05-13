@@ -62,7 +62,7 @@ UserSchema.methods.generateJWT = async function (password) {
     }
     const payload = { id: this._id };
     const token = await jwt.sign(payload, process.env.SECRET || "secret!?", {
-      expiresIn: process.env.expiresIn || 36000,
+      expiresIn: process.env.expiresIn || "7d",
     });
     return token;
   } catch (error) {
@@ -74,7 +74,7 @@ UserSchema.methods.generateOauthJWT = async function () {
   try {
     const payload = { id: this._id, email: this.email };
     const token = await jwt.sign(payload, process.env.SECRET, {
-      expiresIn: process.env.expiresIn || 36000,
+      expiresIn: process.env.expiresIn || "7d",
     });
     return token;
   } catch (error) {
