@@ -33,7 +33,6 @@ TestCaseSchema.statics.testAgainst = async function (questionId, userSolution) {
     );
   }
 
-  console.log(expectedOutput, userOutput);
   let passedTestCases = 0;
   for (const key in expectedOutput) {
     const userOp = userOutput[key];
