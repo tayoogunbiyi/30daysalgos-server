@@ -11,7 +11,9 @@ require("../config/passport-config")(passport);
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.send({ title: "Express" });
+  res.send({
+    ok: "true",
+  });
 });
 
 router.use("/auth", authRoutes);
