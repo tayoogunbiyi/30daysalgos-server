@@ -32,7 +32,7 @@ LeaderboardSchema.statics.updateUserPoints = async function (userId, points) {
     await newUserPointMapping.save();
     return points;
   } else {
-    userPointMapping.points = Math.max(userPointMapping.points, points);
+    userPointMapping.points += Math.max(0, points);
     await userPointMapping.save();
     return userPointMapping.points;
   }
