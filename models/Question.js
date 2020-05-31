@@ -52,6 +52,7 @@ const QuestionSchema = new Schema({
 QuestionSchema.methods.toJSON = function () {
   const obj = this.toObject();
   obj["day"] = this.day;
+  obj['points'] = this.pointsObtainable
   // implement day functionality
   // obj['day'] = this.day;
   delete obj["__v "];

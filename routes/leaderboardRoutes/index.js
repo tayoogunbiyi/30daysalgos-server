@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const leaderboard = await Leaderboard.find({})
-    .sort("-points")
+    .sort({ points: -1, lastUpdatedAt: 1 })
     .populate("user", "name email pictureUrl");
   return res.json(
     buildResponse(

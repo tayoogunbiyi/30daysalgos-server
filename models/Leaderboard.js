@@ -15,6 +15,7 @@ const LeaderboardSchema = new Schema({
     type: Number,
     required: true,
   },
+  lastUpdatedAt: { type: Number, default: Infinity },
 });
 
 LeaderboardSchema.methods.toJSON = function () {
@@ -29,10 +30,12 @@ LeaderboardSchema.statics.updateUserPoints = async function (userId, points) {
     const newUserPointMapping = new this();
     newUserPointMapping.user = userId;
     newUserPointMapping.points = points;
+    newUserPointMapping.lastUpdatedAt = new Date().getTime();
     await newUserPointMapping.save();
     return points;
   } else {
     userPointMapping.points += Math.max(0, points);
+    userPointMapping.lastUpdatedAt = new Date().getTime();
     await userPointMapping.save();
     return userPointMapping.points;
   }
