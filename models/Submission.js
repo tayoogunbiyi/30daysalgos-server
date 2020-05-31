@@ -48,23 +48,25 @@ SubmissionSchema.statics.createSubmission = async function (
         `Invalid points obtained ${pointsObtained}, max of ${q.pointsObtainable}`
       );
     }
+    if (q.pointsObtainable !== pointsObtained) {
+      return {};
+    }
+
     if (!submission) {
       const newSubmission = new this();
       (newSubmission.user = userId), (newSubmission.question = questionId);
       newSubmission.maxpointsObtained = pointsObtained;
       newSubmission.completed = pointsObtained === q.pointsObtainable;
       await newSubmission.save();
+      return { ...newSubmission.toJSON(), isNew: true };
     } else {
-      submission.maxpointsObtained = Math.max(
-        q.pointsObtainable,
-        submission.maxpointsObtained,
-        pointsObtained
-      );
+      submission.maxpointsObtained = pointsObtained;
       submission.attempts += 1;
       if (!submission.completed) {
         submission.completed = pointsObtained === q.pointsObtainable;
       }
       await submission.save();
+      return { ...submission.toJSON(), isNew: false };
     }
   } catch (error) {
     throw new Error(error.message);

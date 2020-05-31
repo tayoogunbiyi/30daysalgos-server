@@ -21,8 +21,13 @@ const submissionController = async (req, res) => {
       passedTestCases,
       totalTestCases
     );
-    await Submission.createSubmission(userId, questionId, pointsObtained);
-    if (pointsObtained !== 0) {
+    const submission = await Submission.createSubmission(
+      userId,
+      questionId,
+      pointsObtained
+    );
+    if (pointsObtained !== 0 && submission && submission.isNew) {
+      // console.log(submission);
       await Leaderboard.updateUserPoints(userId, pointsObtained);
     }
     res.status(200).json(
